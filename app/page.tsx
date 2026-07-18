@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import FluidBackdrop from "./components/FluidBackdrop";
 import { projects } from "./data/projects";
 
 const selectedProject = projects[0];
@@ -38,7 +39,7 @@ export default function Home() {
   return (
     <main className="portfolio" onPointerMove={handlePointerMove}>
       <div className="ambient" aria-hidden="true">
-        <img className="ambient__image" src="/fluid-background.png" alt="" />
+        <FluidBackdrop className="ambient__fluid" scope="window" />
         {projects.map((project, index) => (
           <video
             className={`ambient__video ${backgroundProject === index ? "is-visible" : ""}`}

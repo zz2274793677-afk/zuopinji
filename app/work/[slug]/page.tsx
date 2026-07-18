@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import FluidBackdrop from "../../components/FluidBackdrop";
+import PortfolioVideoPlayer from "../../components/PortfolioVideoPlayer";
 import { getAdjacentProjects, getProject, projects } from "../../data/projects";
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -76,6 +78,7 @@ export default async function ProjectPage({ params }: PageProps) {
       </section>
 
       <section className="case-film case-section">
+        <FluidBackdrop className="case-fluid" />
         <div className="container">
           <div className="case-section-label light-label">02 / FINAL FILM</div>
           <div className="case-film-heading">
@@ -84,13 +87,13 @@ export default async function ProjectPage({ params }: PageProps) {
           </div>
           <div className="case-video-stack">
             {project.videos.map((video) => (
-              <article className="case-video" key={video.src}>
-                <video controls playsInline preload="metadata" poster={project.poster}>
-                  <source src={video.src} type="video/mp4" />
-                  当前浏览器无法播放此视频。
-                </video>
-                <div><h3>{video.label}</h3><span>{video.duration}</span></div>
-              </article>
+              <PortfolioVideoPlayer
+                durationLabel={video.duration}
+                label={video.label}
+                poster={project.poster}
+                src={video.src}
+                key={video.src}
+              />
             ))}
           </div>
         </div>
@@ -143,6 +146,7 @@ export default async function ProjectPage({ params }: PageProps) {
       </section>
 
       <footer className="case-next">
+        <FluidBackdrop className="case-fluid" />
         <Link href={`/work/${previous.slug}`}><span>PREVIOUS</span><p>{previous.title}</p></Link>
         <Link className="next-link" href={`/work/${next.slug}`}><span>NEXT PROJECT</span><p>{next.title} <Arrow /></p></Link>
       </footer>
