@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: zuopinji
+    runtime: node
+    plan: free
+    buildCommand: npm ci --ignore-scripts && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
