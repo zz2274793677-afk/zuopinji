@@ -19,6 +19,65 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const revealElements = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-scroll-reveal]"),
+    );
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let scrollFrame: number | null = null;
+
+    const clamp = (value: number) => Math.min(1, Math.max(0, value));
+
+    const updateRevealProgress = () => {
+      scrollFrame = null;
+
+      if (reduceMotion.matches) {
+        revealElements.forEach((element) => {
+          element.style.removeProperty("--scroll-opacity");
+          element.style.removeProperty("--scroll-y");
+          element.style.removeProperty("--scroll-blur");
+        });
+        return;
+      }
+
+      const viewportHeight = window.innerHeight;
+
+      revealElements.forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        const enterProgress = clamp(
+          (viewportHeight * 0.94 - rect.top) / (viewportHeight * 0.34),
+        );
+        const exitProgress = clamp(
+          (viewportHeight * 0.16 - rect.bottom) / (viewportHeight * 0.42),
+        );
+        const visibility = clamp(Math.min(enterProgress, 1 - exitProgress));
+        const translateY = (1 - enterProgress) * 52 - exitProgress * 28;
+        const blur = (1 - visibility) * 8;
+
+        element.style.setProperty("--scroll-opacity", visibility.toFixed(3));
+        element.style.setProperty("--scroll-y", `${translateY.toFixed(2)}px`);
+        element.style.setProperty("--scroll-blur", `${blur.toFixed(2)}px`);
+      });
+    };
+
+    const queueRevealUpdate = () => {
+      if (scrollFrame !== null) return;
+      scrollFrame = requestAnimationFrame(updateRevealProgress);
+    };
+
+    updateRevealProgress();
+    window.addEventListener("scroll", queueRevealUpdate, { passive: true });
+    window.addEventListener("resize", queueRevealUpdate);
+    reduceMotion.addEventListener("change", queueRevealUpdate);
+
+    return () => {
+      if (scrollFrame !== null) cancelAnimationFrame(scrollFrame);
+      window.removeEventListener("scroll", queueRevealUpdate);
+      window.removeEventListener("resize", queueRevealUpdate);
+      reduceMotion.removeEventListener("change", queueRevealUpdate);
+    };
+  }, []);
+
   function handlePointerMove(event: React.PointerEvent<HTMLElement>) {
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
     frameRef.current = requestAnimationFrame(() => {
@@ -70,7 +129,7 @@ export default function Home() {
         <span className="site-nav__dot" aria-hidden="true" />
       </nav>
 
-      <section className="stage-hero" id="top">
+      <section className="stage-hero scroll-reveal" id="top" data-scroll-reveal>
         <p className="hero-role">VISUAL DESIGNER / AI DESIGNER / BRAND DESIGNER</p>
         <h1 className="hero-wordmark" aria-label="Mingxiao">MINGXIAO</h1>
 
@@ -106,12 +165,30 @@ export default function Home() {
         onPointerLeave={() => setBackgroundProject(null)}
       >
         <div className="container project-stage__inner">
-          <div className="project-stage__heading">
+          <div className="project-stage__heading scroll-reveal" data-scroll-reveal>
             <span>01 / SELECTED WORK</span>
             <p>五个真实项目 · 站内播放 · 独立案例页</p>
           </div>
 
-          <div className="active-project">
+          <div className="project-rail scroll-reveal" role="list" aria-label="项目切换" data-scroll-reveal>
+            {projects.map((project, index) => (
+              <button
+                className={activeIndex === index ? "is-active" : ""}
+                type="button"
+                onClick={() => selectProject(index)}
+                onPointerEnter={() => selectProject(index)}
+                onFocus={() => selectProject(index)}
+                aria-pressed={activeIndex === index}
+                aria-label={`切换到${project.title}`}
+                key={project.slug}
+              >
+                <strong>{project.index}</strong>
+                <span>{project.title}<small>{project.enTitle}</small></span>
+              </button>
+            ))}
+          </div>
+
+          <div className="active-project scroll-reveal" data-scroll-reveal>
             <div className="active-project__copy">
               <span className="active-project__number">{activeProject.index} / PROJECT</span>
               <h2>{activeProject.title}<br /><i>{activeProject.enTitle}</i></h2>
@@ -140,28 +217,11 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="project-rail" role="list" aria-label="项目切换">
-            {projects.map((project, index) => (
-              <button
-                className={activeIndex === index ? "is-active" : ""}
-                type="button"
-                onClick={() => selectProject(index)}
-                onPointerEnter={() => selectProject(index)}
-                onFocus={() => selectProject(index)}
-                aria-pressed={activeIndex === index}
-                aria-label={`切换到${project.title}`}
-                key={project.slug}
-              >
-                <strong>{project.index}</strong>
-                <span>{project.title}<small>{project.enTitle}</small></span>
-              </button>
-            ))}
-          </div>
         </div>
       </section>
 
       <section className="about-stage" id="about">
-        <div className="container about-stage__inner">
+        <div className="container about-stage__inner scroll-reveal" data-scroll-reveal>
           <div className="about-stage__copy">
             <span>02 / ABOUT</span>
             <h2>我用视觉思考，<br />用设计建立秩序。</h2>
@@ -180,7 +240,7 @@ export default function Home() {
       </section>
 
       <footer className="contact-stage" id="contact">
-        <div className="container contact-stage__inner">
+        <div className="container contact-stage__inner scroll-reveal" data-scroll-reveal>
           <span>03 / CONTACT</span>
           <p>OPEN TO INTERNSHIP<br />AND CREATIVE COLLABORATION</p>
           <a href="mailto:2274793677@qq.com">2274793677@qq.com</a>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ScrollToTop from "./components/ScrollToTop";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://zhao-mingxiao-portfolio.fuzzy-clove-4197.chatgpt.site"),
@@ -33,7 +34,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body>
+        <ScrollToTop />
+        {children}
+      </body>
     </html>
   );
 }
