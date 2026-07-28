@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   creator: "赵明啸",
   openGraph: {
     title: "赵明啸 — 视觉 / AI / 品牌设计作品集",
-    description: "五个真实影像项目，以及它们从概念到成片的完整创作过程。",
+    description: "八个真实影像项目，包括企业合作 AI 数字人口播、AIGC 微电影与校园实拍作品。",
     type: "website",
     locale: "zh_CN",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "赵明啸作品集" }],

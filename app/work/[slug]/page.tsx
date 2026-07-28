@@ -31,6 +31,7 @@ export default async function ProjectPage({ params }: PageProps) {
   const project = getProject(slug);
   if (!project) notFound();
   const { previous, next } = getAdjacentProjects(project.slug);
+  const currentIndex = projects.findIndex((item) => item.slug === project.slug);
 
   return (
     <main className="case-page" style={{ "--case-accent": project.accent } as CSSProperties}>
@@ -38,7 +39,7 @@ export default async function ProjectPage({ params }: PageProps) {
         <Link className="brand case-brand" href="/">
           <span>ZM</span><i>PORTFOLIO<br />INDEX / 26</i>
         </Link>
-        <Link className="case-back" href="/#work">← BACK TO INDEX</Link>
+        <Link className="case-back" href="/#work">ALL WORKS / 08</Link>
         <a className="case-contact" href="mailto:2274793677@qq.com">CONTACT <Arrow /></a>
       </nav>
 
@@ -55,10 +56,32 @@ export default async function ProjectPage({ params }: PageProps) {
           <p className="case-cn-title">{project.title}</p>
           <div className="case-hero-bottom">
             <p>{project.statement}</p>
-            <span>SCROLL TO VIEW THE CASE ↓</span>
+            <span>{String(currentIndex + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")} · SCROLL TO VIEW THE CASE ↓</span>
           </div>
         </div>
       </header>
+
+      <aside className="case-project-rail" aria-label="全部作品">
+        <div className="container">
+          <div className="case-project-rail__head">
+            <span>ALL PROJECTS</span>
+            <Link href="/#work">VIEW FULL INDEX ↗</Link>
+          </div>
+          <div className="case-project-rail__items">
+            {projects.map((item) => (
+              <Link
+                className={item.slug === project.slug ? "is-active" : ""}
+                href={`/work/${item.slug}`}
+                aria-current={item.slug === project.slug ? "page" : undefined}
+                key={item.slug}
+              >
+                <b>{item.index}</b>
+                <span>{item.title}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </aside>
 
       <section className="case-overview case-section">
         <div className="container">
@@ -148,6 +171,7 @@ export default async function ProjectPage({ params }: PageProps) {
       <footer className="case-next">
         <FluidBackdrop className="case-fluid" />
         <Link href={`/work/${previous.slug}`}><span>PREVIOUS</span><p>{previous.title}</p></Link>
+        <Link className="all-work-link" href="/#work"><span>PROJECT INDEX</span><p>ALL 08 WORKS</p></Link>
         <Link className="next-link" href={`/work/${next.slug}`}><span>NEXT PROJECT</span><p>{next.title} <Arrow /></p></Link>
       </footer>
     </main>

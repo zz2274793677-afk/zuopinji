@@ -1,17 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import FluidBackdrop from "./components/FluidBackdrop";
 import { projects } from "./data/projects";
 
 const selectedProject = projects[0];
+const featuredProjects = projects.slice(0, 3);
 
 export default function Home() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [backgroundProject, setBackgroundProject] = useState<number | null>(null);
   const frameRef = useRef<number | null>(null);
-  const activeProject = projects[activeIndex];
 
   useEffect(() => {
     return () => {
@@ -90,29 +88,10 @@ export default function Home() {
     });
   }
 
-  function selectProject(index: number) {
-    setActiveIndex(index);
-    setBackgroundProject(index);
-  }
-
   return (
     <main className="portfolio" onPointerMove={handlePointerMove}>
       <div className="ambient" aria-hidden="true">
         <FluidBackdrop className="ambient__fluid" scope="window" />
-        {projects.map((project, index) => (
-          <video
-            className={`ambient__video ${backgroundProject === index ? "is-visible" : ""}`}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster={project.poster}
-            key={project.slug}
-          >
-            <source src={project.preview} type="video/mp4" />
-          </video>
-        ))}
         <div className="ambient__shade" />
       </div>
 
@@ -122,7 +101,8 @@ export default function Home() {
           <span>赵明啸</span>
         </a>
         <div className="site-nav__links">
-          <a href="#work">WORK</a>
+          <a href="#featured">FEATURED</a>
+          <a href="#work">ALL WORK</a>
           <a href="#about">ABOUT</a>
           <a href="#contact">CONTACT</a>
         </div>
@@ -142,88 +122,94 @@ export default function Home() {
           </div>
           <Link className="hero-cta" href={`/work/${selectedProject.slug}`}>
             <b>PLAY</b>
-            <span>ENTER PROJECT</span>
+            <span>ENTER NEW PROJECT</span>
           </Link>
         </div>
 
-        <Link className="hero-film" href={`/work/${selectedProject.slug}`} aria-label={`进入${selectedProject.title}项目案例`}>
+        <Link className="hero-film hero-film--portrait" href={`/work/${selectedProject.slug}`} aria-label={`进入${selectedProject.title}项目案例`}>
           <img src={selectedProject.poster} alt="" />
           <video autoPlay muted loop playsInline preload="metadata" poster={selectedProject.poster}>
             <source src={selectedProject.preview} type="video/mp4" />
           </video>
-          <span className="hero-film__index">01 / FEATURED FILM</span>
-          <span className="hero-film__title">{selectedProject.title} · {selectedProject.enTitle}</span>
+          <span className="hero-film__index">01 / NEW FEATURED</span>
+          <span className="hero-film__title">{selectedProject.title}</span>
         </Link>
 
         <p className="hero-manifesto">DESIGN <span>IS NOT</span> DECORATION</p>
-        <a className="hero-scroll" href="#work">SCROLL TO WORK</a>
+        <a className="hero-scroll" href="#featured">SCROLL TO WORK</a>
       </section>
 
-      <section
-        className="project-stage"
-        id="work"
-        onPointerLeave={() => setBackgroundProject(null)}
-      >
-        <div className="container project-stage__inner">
-          <div className="project-stage__heading scroll-reveal" data-scroll-reveal>
-            <span>01 / SELECTED WORK</span>
-            <p>五个真实项目 · 站内播放 · 独立案例页</p>
+      <section className="featured-stage" id="featured">
+        <div className="container">
+          <div className="section-heading scroll-reveal" data-scroll-reveal>
+            <span>01 / NEW FEATURED</span>
+            <div>
+              <h2>企业合作<br />AI 数字人口播</h2>
+              <p>三条独立商业内容，全部由我全流程负责。</p>
+            </div>
           </div>
 
-          <div className="project-rail scroll-reveal" role="list" aria-label="项目切换" data-scroll-reveal>
-            {projects.map((project, index) => (
-              <button
-                className={activeIndex === index ? "is-active" : ""}
-                type="button"
-                onClick={() => selectProject(index)}
-                onPointerEnter={() => selectProject(index)}
-                onFocus={() => selectProject(index)}
-                aria-pressed={activeIndex === index}
-                aria-label={`切换到${project.title}`}
+          <div className="featured-grid">
+            {featuredProjects.map((project, index) => (
+              <Link
+                className={`featured-card featured-card--${index + 1} scroll-reveal`}
+                href={`/work/${project.slug}`}
+                data-scroll-reveal
                 key={project.slug}
               >
-                <strong>{project.index}</strong>
-                <span>{project.title}<small>{project.enTitle}</small></span>
-              </button>
+                <div className="featured-card__media">
+                  <img src={project.poster} alt={`${project.title}封面`} />
+                  <video autoPlay muted loop playsInline preload="metadata" poster={project.poster}>
+                    <source src={project.preview} type="video/mp4" />
+                  </video>
+                  <span className="featured-card__play">VIEW CASE ↗</span>
+                </div>
+                <div className="featured-card__meta">
+                  <span>{project.index}</span>
+                  <h3>{project.title}</h3>
+                  <p>{project.category} · {project.duration}</p>
+                </div>
+              </Link>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="active-project scroll-reveal" data-scroll-reveal>
-            <div className="active-project__copy">
-              <span className="active-project__number">{activeProject.index} / PROJECT</span>
-              <h2>{activeProject.title}<br /><i>{activeProject.enTitle}</i></h2>
-              <dl>
-                <div><dt>ROLE</dt><dd>{activeProject.role}</dd></div>
-                <div><dt>YEAR</dt><dd>{activeProject.year}</dd></div>
-                <div><dt>TYPE</dt><dd>{activeProject.category}</dd></div>
-              </dl>
-              <p>{activeProject.summary}</p>
-              <Link className="text-link" href={`/work/${activeProject.slug}`}>VIEW FULL CASE</Link>
+      <section className="work-index" id="work">
+        <div className="container">
+          <div className="section-heading section-heading--compact scroll-reveal" data-scroll-reveal>
+            <span>02 / ALL WORK</span>
+            <div>
+              <h2>全部作品</h2>
+              <p>八个项目全部直接可见，点击任意卡片进入完整案例。</p>
             </div>
-
-            <Link className="active-project__media" href={`/work/${activeProject.slug}`} aria-label={`查看${activeProject.title}完整案例`}>
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                poster={activeProject.poster}
-                key={activeProject.preview}
-              >
-                <source src={activeProject.preview} type="video/mp4" />
-              </video>
-              <span className="media-play">PLAY FILM</span>
-            </Link>
           </div>
 
+          <div className="work-grid">
+            {projects.map((project) => (
+              <Link className="work-card scroll-reveal" href={`/work/${project.slug}`} data-scroll-reveal key={project.slug}>
+                <div className="work-card__media">
+                  <img src={project.poster} alt={`${project.title}封面`} />
+                  <span>OPEN PROJECT ↗</span>
+                </div>
+                <div className="work-card__copy">
+                  <b>{project.index}</b>
+                  <div>
+                    <h3>{project.title}</h3>
+                    <p>{project.enTitle}</p>
+                  </div>
+                  <small>{project.category}</small>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="about-stage" id="about">
         <div className="container about-stage__inner scroll-reveal" data-scroll-reveal>
           <div className="about-stage__copy">
-            <span>02 / ABOUT</span>
+            <span>03 / ABOUT</span>
             <h2>我用视觉思考，<br />用设计建立秩序。</h2>
             <p>I THINK WITH VISUALS.<br />I BUILD ORDER THROUGH DESIGN.</p>
             <a className="text-link" href="mailto:2274793677@qq.com">LET&apos;S CONNECT</a>
@@ -231,8 +217,8 @@ export default function Home() {
           <div className="about-stage__profile">
             <p>赵明啸，山东外国语职业技术大学数字媒体技术本科在读。专注视觉设计、AI 影像与品牌表达，能够从策划、脚本和分镜出发，完成生成、拍摄、剪辑与最终呈现。</p>
             <dl>
-              <div><dt>05</dt><dd>SELECTED PROJECTS<br />精选项目</dd></div>
-              <div><dt>02</dt><dd>CREATIVE MODES<br />AIGC / 实拍</dd></div>
+              <div><dt>08</dt><dd>SELECTED PROJECTS<br />精选项目</dd></div>
+              <div><dt>03</dt><dd>CREATIVE MODES<br />商业 / AIGC / 实拍</dd></div>
               <div><dt>2026</dt><dd>PORTFOLIO STATUS<br />持续更新</dd></div>
             </dl>
           </div>
@@ -241,7 +227,7 @@ export default function Home() {
 
       <footer className="contact-stage" id="contact">
         <div className="container contact-stage__inner scroll-reveal" data-scroll-reveal>
-          <span>03 / CONTACT</span>
+          <span>04 / CONTACT</span>
           <p>OPEN TO INTERNSHIP<br />AND CREATIVE COLLABORATION</p>
           <a href="mailto:2274793677@qq.com">2274793677@qq.com</a>
           <a href="tel:+8615053465868">+86 150 5346 5868</a>
